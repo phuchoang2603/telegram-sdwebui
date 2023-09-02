@@ -20,7 +20,7 @@ def main():
     masked_image_path = cloth_segmentation(image_path)
 
     positive_prompt = "woman nude, nude bare naked, breasts, detailed nipples"
-    negative_prompt = "ugly, deformed, deformity, disfigured, malformed, ugliness, blurry, disfigured, mutation, mutated, extra limbs, bad anatomy, long body, cropped head, cropped face, two women, anatomical nonsense, malformed hands, long neck, missing limb, floating limbs, disconnected limbs, anime"
+    negative_prompt = "ugly, deformed, deformityc, disfigured, malformed, ugliness, blurry, disfigured, mutation, mutated, extra limbs, bad anatomy, long body, cropped head, cropped face, two women, anatomical nonsense, malformed hands, long neck, missing limb, floating limbs, disconnected limbs, anime"
 
     result_path = img2img(positive_prompt, negative_prompt, image_path, masked_image_path)
 

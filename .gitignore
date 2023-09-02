@@ -1,4 +1,6 @@
 .venv/
+venv/
+__pycache__/
 in-images/
 out-images/
 run.sh

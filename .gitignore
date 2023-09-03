@@ -1,7 +1,9 @@
 .venv/
 venv/
-__pycache__/
+# ignore images
 in-images/
 out-images/
 run.sh
+# ignore all .pyc files
+*.pyc
 ```

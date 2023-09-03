@@ -35,9 +35,19 @@ def cloth_segmentation(image_path):
 
     masked = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB) * 255
 
+    # dilate the mask to make it more smooth
+    # kernel = np.ones((16,16),np.uint8)
+    # masked = cv2.dilate(masked, kernel, iterations = 1)
+
     # save the masked image with the same name with input image but with _masked suffix
     masked_file_name = image_path.split("/")[-1].split(".")[0] + "_masked.jpg"
     cv2.imwrite(f"./in-images/{masked_file_name}", masked)
 
     # return masked image file path
     return f"./in-images/{masked_file_name}"
+
+# Debugging
+# image_path = "in-images/20230903-123812.jpg"
+# masked_image_path = cloth_segmentation(image_path)
+# imshow(load_rgb(masked_image_path))
+# plt.show()

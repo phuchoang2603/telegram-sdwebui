@@ -51,10 +51,10 @@ async def img2img(positive_prompt, negative_prompt, image_path, masked_image_pat
         "sampler_name": "Euler a",
         "restore_faces": True,
         "steps": 20,
-        "cfg_scale": 8,
+        "cfg_scale": 10,
         "width": IMAGE_SIZE,
         "height": IMAGE_SIZE,
-        "denoising_strength": 0.85,
+        "denoising_strength": 0.9,
         "resize_mode": 1,
         "inpainting_fill": 1,
         "inpaint_full_res": True,
@@ -91,10 +91,10 @@ async def img2img(positive_prompt, negative_prompt, image_path, masked_image_pat
                 return None
 
 async def main():
-    image_path = "in-images/366021029_259451880196838_9190101119937173386_n.jpg"
+    image_path = "in-images/20230903-113710.jpg"
     masked_image_path = cloth_segmentation(image_path)
 
-    positive_prompt = "woman nude, nake, breasts, slender boobs, detailed nipples"
+    positive_prompt = "woman nude, completely nake, breasts, slender boobs, detailed nipples"
     negative_prompt = "ugly, deformed, deformityc, disfigured, malformed, ugliness, blurry, disfigured, mutation, mutated, extra limbs, bad anatomy, long body, cropped head, cropped face, two women, anatomical nonsense, malformed hands, long neck, missing limb, floating limbs, disconnected limbs"
 
     # Start the get_progress task in the background

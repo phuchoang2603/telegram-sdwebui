@@ -66,10 +66,10 @@ async def img2img(positive_prompt, negative_prompt, image_path, masked_image_pat
         "sampler_name": "Euler a",
         "restore_faces": True,
         "steps": 20,
-        "cfg_scale": 8,
+        "cfg_scale": 10,
         "width": IMAGE_SIZE,
         "height": IMAGE_SIZE,
-        "denoising_strength": 0.85,
+        "denoising_strength": 0.9,
         "resize_mode": 1,
         "inpainting_fill": 1,
         "inpaint_full_res": True,
@@ -126,7 +126,7 @@ async def receive_image(update: Update, context: CallbackContext) -> int:
         image_path = f"./in-images/received_{user_id}_{timestr}.jpg"
         await new_file.download_to_drive(image_path)
         masked_image_path = cloth_segmentation(image_path)
-        positive_prompt = "woman nude, nake, breasts, slender boobs, detailed nipples"
+        positive_prompt = "woman nude, completely nake, breasts, slender boobs, detailed nipples"
         negative_prompt = "ugly, deformed, deformityc, disfigured, malformed, ugliness, blurry, disfigured, mutation, mutated, extra limbs, bad anatomy, long body, cropped head, cropped face, two women, anatomical nonsense, malformed hands, long neck, missing limb, floating limbs, disconnected limbs"
 
         # Start the get_progress task in the background

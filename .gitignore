@@ -9,5 +9,4 @@ received-images.jpg
 __pycache__/
 # ignore unneeded files
 transition.py
-run.sh
 ```

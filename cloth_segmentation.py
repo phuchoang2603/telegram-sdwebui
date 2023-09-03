@@ -1,5 +1,4 @@
 import os
-from pylab import imshow
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
@@ -45,9 +44,3 @@ def cloth_segmentation(image_path):
 
     # return masked image file path
     return f"./in-images/{masked_file_name}"
-
-# Debugging
-# image_path = "in-images/20230903-123812.jpg"
-# masked_image_path = cloth_segmentation(image_path)
-# imshow(load_rgb(masked_image_path))
-# plt.show()

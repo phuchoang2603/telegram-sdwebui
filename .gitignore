@@ -3,7 +3,11 @@ venv/
 # ignore images
 in-images/
 out-images/
-run.sh
-# ignore all .pyc files
+received-images.jpg
+# ignore all .pyc files in both folder and subfolder
 *.pyc
+__pycache__/
+# ignore unneeded files
+transition.py
+run.sh
 ```

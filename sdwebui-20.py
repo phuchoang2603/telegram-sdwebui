@@ -5,15 +5,15 @@ import base64
 import time
 import logging
 from cloth_segmentation import cloth_segmentation
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackContext
+from telegram import Update, Bot
+from telegram.ext import Application,Updater, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackContext
 
 # Configure logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Define your Telegram Bot token here
-TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN'
+TELEGRAM_BOT_TOKEN = '5754375351:AAGWUHCZ_xRubyJ0minHXy0IuqLAUD867Hg'
 
 sdurl = "http://192.168.1.4:7860"
 IMAGE_SIZE = 384
@@ -39,15 +39,15 @@ async def get_progress(context: CallbackContext):
                     current_sampling_step = progress_info.get("state", {}).get("sampling_step", 0)
                     total_sampling_steps = progress_info.get("state", {}).get("sampling_steps", 1)
                     progress_text = f"Progress: {progress:.2%}, Sampling Step: {current_sampling_step}/{total_sampling_steps}"
-                    context.bot.send_message(chat_id=context.user_data['chat_id'], text=progress_text)
+                    await context.bot.send_message(chat_id=context.user_data['chat_id'], text=progress_text)
                     
                     if total_sampling_steps - current_sampling_step == 1:
                         break  # Stop calling the progress API when this condition is met
                 else:
                     error_message = "Error fetching progress: " + await response.text()
-                    context.bot.send_message(chat_id=context.user_data['chat_id'], text=error_message)
+                    await context.bot.send_message(chat_id=context.user_data['chat_id'], text=error_message)
 
-        await asyncio.sleep(5)  # Wait for 5 seconds before checking progress again
+        await asyncio.sleep(10)  # Wait for 5 seconds before checking progress again
 
 async def img2img(positive_prompt, negative_prompt, image_path, masked_image_path):
     api_url = f"{sdurl}/sdapi/v1/img2img"
@@ -64,7 +64,7 @@ async def img2img(positive_prompt, negative_prompt, image_path, masked_image_pat
         "cfg_scale": 8,
         "width": IMAGE_SIZE,
         "height": IMAGE_SIZE,
-        "denoising_strength": 0.6,
+        "denoising_strength": 0.8,
         "resize_mode": 1,
         "inpainting_fill": 1,
         "inpaint_full_res": True,
@@ -104,7 +104,7 @@ async def img2img(positive_prompt, negative_prompt, image_path, masked_image_pat
 async def start(update: Update, context: CallbackContext) -> int:
     chat_id = update.message.chat_id
     logger.info(f"User {update.message.from_user.username} started the conversation.")
-    context.bot.send_message(chat_id=chat_id, text="Send me an image to process.")
+    await context.bot.send_message(chat_id=chat_id, text="Send me an image to process.")
     return RECEIVING_IMAGE
 
 async def receive_image(update: Update, context: CallbackContext) -> int:
@@ -114,44 +114,48 @@ async def receive_image(update: Update, context: CallbackContext) -> int:
 
     if update.message.photo:
         # Get the largest available photo
-        photo = update.message.photo[-1].get_file()
-        photo.download('received_image.jpg')
+        photo_id = update.message.photo[-1].file_id
+        new_file = await context.bot.get_file(photo_id)
+        await new_file.download_to_drive('received_image.jpg')
         masked_image_path = cloth_segmentation('received_image.jpg')
         positive_prompt = "woman nude, nake, breasts, slender boobs, detailed nipples"
         negative_prompt = "ugly, deformed, deformityc, disfigured, malformed, ugliness, blurry, disfigured, mutation, mutated, extra limbs, bad anatomy, long body, cropped head, cropped face, two women, anatomical nonsense, malformed hands, long neck, missing limb, floating limbs, disconnected limbs"
 
         # Start the get_progress task in the background
-        progress_task = asyncio.create_task(get_progress(context))
+        asyncio.create_task(get_progress(context))
 
         # Run img2img task
         result_path = await img2img(positive_prompt, negative_prompt, 'received_image.jpg', masked_image_path)
 
         # Send the processed image back to the user
-        context.bot.send_photo(chat_id=chat_id, photo=open(result_path, 'rb'))
-        context.bot.send_message(chat_id=chat_id, text="Processing completed!")
+        await context.bot.send_photo(chat_id=chat_id, photo=open(result_path, 'rb'))
+        await context.bot.send_message(chat_id=chat_id, text="Processing completed!")
 
         logger.info(f"Image processed and sent to user {update.message.from_user.username}.")
         return ConversationHandler.END
+    
     else:
-        context.bot.send_message(chat_id=chat_id, text="Please send an image.")
+        await context.bot.send_message(chat_id=chat_id, text="Please send an image.")
         logger.warning(f"User {update.message.from_user.username} did not send an image as expected.")
         return RECEIVING_IMAGE
 
-async def main():
-    updater = Updater(token=TELEGRAM_BOT_TOKEN, use_context=True)
-    dp = updater.dispatcher
+
+def main ():
+    print ("Starting...")
+    application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
-            RECEIVING_IMAGE: [MessageHandler(Filters.photo, receive_image)],
+            RECEIVING_IMAGE: [MessageHandler(filters.PHOTO, receive_image)],
         },
         fallbacks=[],
     )
+    application.add_handler(conv_handler)
 
-    dp.add_handler(conv_handler)
-    updater.start_polling()
-    updater.idle()
+    print ("Running...")
+    application.run_polling()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+if __name__ == '__main__':
+    main()
+

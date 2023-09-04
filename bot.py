@@ -20,13 +20,38 @@ sdurl = "http://127.0.0.1:7860"
 IMAGE_SIZE = 384
 
 # Define conversation states
-RECEIVING_TEXT, RECEIVING_IMAGE = range(2)
+RECEIVING_POSITIVE_PROMPT, RECEIVING_IMAGE, REGENERATE_FLOW = range(3)
 
 async def start(update: Update, context: CallbackContext) -> int:
     chat_id = update.message.chat_id
     logger.info(f"User {update.message.from_user.username} started the conversation.")
-    await context.bot.send_message(chat_id=chat_id, text="Send me an image to process.")
-    return RECEIVING_IMAGE
+    await context.bot.send_message(chat_id=chat_id, text="Welcome to the Cloth Segmentation Bot! Please enter a positive prompt to get started. You can also enter 'skip' to use the default prompt.")
+    return RECEIVING_POSITIVE_PROMPT
+
+async def regenerate_flow(update: Update, context: CallbackContext) -> int:
+    chat_id = update.message.chat_id
+    logger.info(f"User {update.message.from_user.username} requested to end the conversation.")
+    await context.bot.send_message(chat_id=chat_id, text="Ending the conversation.")
+    
+    # Clear user data
+    context.user_data.clear()
+    # End the conversation
+    return ConversationHandler.END
+
+async def receive_positive_prompt(update: Update, context: CallbackContext) -> int:
+    user_input = update.message.text.strip()
+    
+    if user_input.lower() == 'skip':
+        # If the user enters "skip," set a default prompt
+        context.user_data['positive_prompt'] = "woman nude, completely nake, no bra, slender boobs, detailed nipples"
+        await context.bot.send_message(chat_id=update.message.chat_id, text="Using default positive prompt.")
+    else:
+        # Store the user's input as the positive prompt
+        context.user_data['positive_prompt'] = user_input
+
+    await context.bot.send_message(chat_id=update.message.chat_id, text=f"Positive prompt set to: {context.user_data['positive_prompt']}")
+    await context.bot.send_message(chat_id=update.message.chat_id, text="Please send me an image to process.")
+    return RECEIVING_IMAGE  # Change state to RECEIVING_IMAGE here
 
 async def receive_image(update: Update, context: CallbackContext) -> int:
     user_id = update.message.from_user.id
@@ -48,17 +73,18 @@ async def receive_image(update: Update, context: CallbackContext) -> int:
     await context.bot.send_message(chat_id=chat_id, text="Mask generated.")
     await context.bot.send_photo(chat_id=chat_id, photo=open(masked_image_path, 'rb'))
 
-    positive_prompt = "woman nude, completely nake, no bra, slender boobs, detailed nipples"
+    positive_prompt = context.user_data.get('positive_prompt')  # Get the positive_prompt from user data
 
     while True:  # Keep retrying until successful
         try:
             img2img_task = asyncio.create_task(sdwebui.img2img(positive_prompt, image_path, masked_image_path))
+            await sdwebui.get_progress() # Initialize progress variables to handle server restarts right after calling img2img
 
             # Initialize variables to track progress
             job_count = 1
 
-            # Wait for 60 seconds before checking progress
-            time.sleep(60)
+            # Wait for 30 seconds before checking progress
+            time.sleep(30)
 
             await context.bot.send_message(chat_id=chat_id, text="Processing your image...")
 
@@ -100,18 +126,20 @@ async def receive_image(update: Update, context: CallbackContext) -> int:
             result_path = await img2img_task
 
             await context.bot.send_message(chat_id=chat_id, text="Image processing completed!")
+            await context.bot.send_photo(chat_id=chat_id, photo=open(image_path, 'rb'))
             await context.bot.send_photo(chat_id=chat_id, photo=open(result_path, 'rb'))
 
-            logger.info(f"Image processed and sent to user {update.message.from_user.username}.")
-            
             # If we reach this point, the operation was successful, so break out of the loop
+            logger.info(f"Image processed and sent to user {update.message.from_user.username}.")
+            await context.bot.send_message(chat_id=chat_id, text="End of conversation. Send /start to start again.")            
             return ConversationHandler.END
 
         except asyncio.TimeoutError:
             # Handle timeout error separately
-            error_message = "Timeout error occurred."
+            error_message = "Timeout error occurred. Wait and start the command again"
             logger.error(error_message)
-            await context.bot.send_message(chat_id=chat_id, text=error_message)            
+            await context.bot.send_message(chat_id=chat_id, text=error_message)          
+            await context.bot.send_message(chat_id=chat_id, text="End of conversation. Send /start to start again.")
             return ConversationHandler.END
         
         except Exception as e:
@@ -129,9 +157,10 @@ def main ():
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],
         states={
+            RECEIVING_POSITIVE_PROMPT: [MessageHandler(filters.TEXT, receive_positive_prompt)],
             RECEIVING_IMAGE: [MessageHandler(filters.PHOTO, receive_image)],
         },
-        fallbacks=[],
+        fallbacks=[CommandHandler('restart', regenerate_flow)],
     )
     application.add_handler(conv_handler)
 

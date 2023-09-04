@@ -62,23 +62,23 @@ async def img2img(positive_prompt, image_path, masked_image_path):
         "cfg_scale": 10,
         "width": IMAGE_SIZE,
         "height": IMAGE_SIZE,
-        "denoising_strength": 0.6,
+        "denoising_strength": 0.7,
         "resize_mode": 1,
         "inpainting_fill": 1,
         "inpaint_full_res": True,
         "inpaint_full_res_padding": 100,
-        "alwayson_scripts": {
-            "controlnet": {
-            "args": [
-                {
-                "module": "openpose_full",
-                "model": "control_v11p_sd15_openpose [cab727d4]",
-                "resize_mode": 1,
-                "processor_res": IMAGE_SIZE
-                }
-            ]
-            }
-        }
+        # "alwayson_scripts": {
+        #     "controlnet": {
+        #     "args": [
+        #         {
+        #         "module": "openpose_full",
+        #         "model": "control_v11p_sd15_openpose [cab727d4]",
+        #         "resize_mode": 1,
+        #         "processor_res": IMAGE_SIZE
+        #         }
+        #     ]
+        #     }
+        # }
     }
 
     async with aiohttp.ClientSession() as session:

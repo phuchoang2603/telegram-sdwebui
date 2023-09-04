@@ -35,7 +35,7 @@ def create_mask(image_path):
     masked = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB) * 255
 
     # dilate the mask to make it more smooth
-    kernel = np.ones((16,16),np.uint8)
+    kernel = np.ones((100,100),np.uint8)
     masked = cv2.dilate(masked, kernel, iterations = 1)
 
     # save the masked image with the same name with input image but with _masked suffix

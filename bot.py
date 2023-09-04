@@ -14,7 +14,9 @@ logger = logging.getLogger(__name__)
 # Define your Telegram Bot token here
 TELEGRAM_BOT_TOKEN = '5754375351:AAGWUHCZ_xRubyJ0minHXy0IuqLAUD867Hg'
 
+# add fallback url here
 sdurl = "http://127.0.0.1:7860"
+# sdurl = "http://192.168.1.4:7860"
 IMAGE_SIZE = 384
 
 # Define conversation states
@@ -46,7 +48,7 @@ async def receive_image(update: Update, context: CallbackContext) -> int:
     await context.bot.send_message(chat_id=chat_id, text="Mask generated.")
     await context.bot.send_photo(chat_id=chat_id, photo=open(masked_image_path, 'rb'))
 
-    positive_prompt = "woman nude, completely nake, no bra, breasts, slender boobs, detailed nipples"
+    positive_prompt = "woman nude, completely nake, no bra, slender boobs, detailed nipples"
 
     while True:  # Keep retrying until successful
         try:
@@ -55,8 +57,8 @@ async def receive_image(update: Update, context: CallbackContext) -> int:
             # Initialize variables to track progress
             job_count = 1
 
-            # Wait for 5 seconds before checking progress
-            await asyncio.sleep(5)
+            # Wait for 60 seconds before checking progress
+            time.sleep(60)
 
             await context.bot.send_message(chat_id=chat_id, text="Processing your image...")
 
@@ -105,12 +107,19 @@ async def receive_image(update: Update, context: CallbackContext) -> int:
             # If we reach this point, the operation was successful, so break out of the loop
             return ConversationHandler.END
 
+        except asyncio.TimeoutError:
+            # Handle timeout error separately
+            error_message = "Timeout error occurred."
+            logger.error(error_message)
+            await context.bot.send_message(chat_id=chat_id, text=error_message)            
+            return ConversationHandler.END
+        
         except Exception as e:
-            error_message = f"An error occurred: {str(e)}, Retrying in 10 seconds..."
+            error_message = f"An error occurred: {str(e)}, Retrying in 30 seconds..."
             logger.error(error_message)
             await context.bot.send_message(chat_id=chat_id, text=error_message)
-            # wait for 10 seconds before retrying
-            await asyncio.sleep(10)
+            # wait for 30 seconds before retrying
+            time.sleep(30)
 
 
 def main ():

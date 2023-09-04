@@ -17,7 +17,7 @@ try:
 except:
     pass
 
-def cloth_segmentation(image_path):
+def create_mask(image_path):
     image = load_rgb(image_path)
 
     transform = albu.Compose([albu.Normalize(p=1)], p=1)
@@ -35,8 +35,8 @@ def cloth_segmentation(image_path):
     masked = cv2.cvtColor(mask, cv2.COLOR_GRAY2RGB) * 255
 
     # dilate the mask to make it more smooth
-    # kernel = np.ones((16,16),np.uint8)
-    # masked = cv2.dilate(masked, kernel, iterations = 1)
+    kernel = np.ones((16,16),np.uint8)
+    masked = cv2.dilate(masked, kernel, iterations = 1)
 
     # save the masked image with the same name with input image but with _masked suffix
     masked_file_name = image_path.split("/")[-1].split(".")[0] + "_masked.jpg"

@@ -1,1 +1,1 @@
-./webui.sh --listen --api --disable-nan-check --no-half-vae --enable-insecure-extension-access --xformers --opt-split-attention --medvram --upcast-sampling
+webui.sh --listen --api --disable-nan-check --no-half-vae --enable-insecure-extension-access --xformers --opt-split-attention --medvram --upcast-sampling --always-batch-cond-uncond 

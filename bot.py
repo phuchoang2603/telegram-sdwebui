@@ -14,11 +14,6 @@ logger = logging.getLogger(__name__)
 # Define your Telegram Bot token here
 TELEGRAM_BOT_TOKEN = '5754375351:AAGWUHCZ_xRubyJ0minHXy0IuqLAUD867Hg'
 
-# add fallback url here
-sdurl = "http://127.0.0.1:7860"
-# sdurl = "http://192.168.1.4:7860"
-IMAGE_SIZE = 384
-
 # Define conversation states
 RECEIVING_POSITIVE_PROMPT, RECEIVING_IMAGE, REGENERATE_FLOW = range(3)
 

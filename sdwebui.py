@@ -6,7 +6,8 @@ import time
 from cloth_segmentation import create_mask
 import requests
 
-sdurl = "http://192.168.1.4:7860"
+sdurl = "http://127.0.0.1:7860"
+# sdurl = "http://192.168.1.4:7860"
 IMAGE_SIZE = 384
 
 try:

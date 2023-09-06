@@ -6,7 +6,8 @@ import time
 from cloth_segmentation import create_mask
 import requests
 
-sdurl = "http://192.168.1.4:7860"
+sdurl = "http://127.0.0.1:7860"
+# sdurl = "http://192.168.1.4:7860"
 IMAGE_SIZE = 384
 
 try:
@@ -55,7 +56,6 @@ async def img2img(positive_prompt, image_path, masked_image_path):
         "negative_prompt": "ugly, deformed, deformityc, disfigured, malformed, ugliness, blurry, disfigured, mutation, mutated, extra limbs, bad anatomy, long body, cropped head, cropped face, two women, anatomical nonsense, malformed hands, long neck, missing limb, floating limbs, disconnected limbs",
         "init_images": [encode_image(image_path)],
         "mask": encode_image(masked_image_path),
-        "mask_blur": 16,
         "sampler_name": "Euler a",
         "restore_faces": True,
         "steps": 20,

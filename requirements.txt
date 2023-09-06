@@ -4,7 +4,5 @@ iglovikov-helper-functions
 matplotlib
 numpy
 opencv-python-headless
-Pillow
-pycocotools
 torch
 python-telegram-bot

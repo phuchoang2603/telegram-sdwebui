@@ -53,7 +53,7 @@ async def img2img(positive_prompt, image_path, masked_image_path):
     api_url = f"{sdurl}/sdapi/v1/img2img"
     payload = {
         "prompt": positive_prompt,
-        "negative_prompt": "ugly, deformed, deformityc, disfigured, malformed, ugliness, blurry, disfigured, mutation, mutated, extra limbs, bad anatomy, long body, cropped head, cropped face, two women, anatomical nonsense, malformed hands, long neck, missing limb, floating limbs, disconnected limbs",
+        "negative_prompt": "ugly, deformed, deformityc, disfigured, malformed, ugliness, blurry, disfigured, mutation, mutated, extra limbs, bad anatomy, long body, cropped head, cropped face, anatomical nonsense, malformed hands, long neck, missing limb, floating limbs, disconnected limbs",
         "init_images": [encode_image(image_path)],
         "mask": encode_image(masked_image_path),
         "mask_blur": 16,
@@ -68,20 +68,20 @@ async def img2img(positive_prompt, image_path, masked_image_path):
         "inpainting_fill": 1,
         "inpaint_full_res": True,
         "inpaint_full_res_padding": 100,
-        "alwayson_scripts": {
-            "controlnet": {
-            "args": [
-                {
-                "module": "openpose_full",
-                "model": "control_v11p_sd15_openpose [cab727d4]",
-                "resize_mode": 1,
-                "processor_res": IMAGE_SIZE,
-                "lowvram": True,
-                "pixel_perfect": True,
-                }
-            ]
-            }
-        }
+        # "alwayson_scripts": {
+        #     "controlnet": {
+        #     "args": [
+        #         {
+        #         "module": "openpose_full",
+        #         "model": "control_v11p_sd15_openpose [cab727d4]",
+        #         "resize_mode": 1,
+        #         "processor_res": IMAGE_SIZE,
+        #         "lowvram": True,
+        #         "pixel_perfect": True,
+        #         }
+        #     ]
+        #     }
+        # }
     }
 
     async with aiohttp.ClientSession() as session:

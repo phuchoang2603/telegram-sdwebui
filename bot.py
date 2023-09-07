@@ -114,8 +114,8 @@ async def receive_image(update: Update, context: CallbackContext) -> int:
                     error_message = progress_result
                     logger.error(error_message)
 
-                # Wait for 10 seconds before checking progress again
-                time.sleep(10)
+                # Wait for 30 seconds before checking progress again
+                time.sleep(30)
 
             # Wait for img2img to complete
             result_path = await img2img_task

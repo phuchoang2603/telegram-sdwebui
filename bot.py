@@ -20,7 +20,7 @@ RECEIVING_POSITIVE_PROMPT, RECEIVING_IMAGE, REGENERATE_FLOW = range(3)
 async def start(update: Update, context: CallbackContext) -> int:
     chat_id = update.message.chat_id
     logger.info(f"User {update.message.from_user.username} started the conversation.")
-    await context.bot.send_message(chat_id=chat_id, text="Welcome to the Cloth Segmentation Bot! Please enter a positive prompt to get started. You can also enter 'skip' to use the default prompt.")
+    await context.bot.send_message(chat_id=chat_id, text="Welcome to the Cloth Segmentation Bot! Please enter a positive prompt to get started. You can also enter 'skip' to use the default prompt, which is 'spider man clothes'")
     return RECEIVING_POSITIVE_PROMPT
 
 async def regenerate_flow(update: Update, context: CallbackContext) -> int:
@@ -38,7 +38,7 @@ async def receive_positive_prompt(update: Update, context: CallbackContext) -> i
     
     if user_input.lower() == 'skip':
         # If the user enters "skip," set a default prompt
-        context.user_data['positive_prompt'] = "woman nude, completely nake, no bra, slender boobs, detailed nipples"
+        context.user_data['positive_prompt'] = "spider man clothes"
         await context.bot.send_message(chat_id=update.message.chat_id, text="Using default positive prompt.")
     else:
         # Store the user's input as the positive prompt
